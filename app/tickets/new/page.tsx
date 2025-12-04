@@ -30,12 +30,12 @@ export default function NewTicketPage() {
       }
 
       const ticket = await response.json()
-      
+
       // Redirect to the new ticket's page
       router.push(`/tickets/${ticket.id}`)
     } catch (error) {
       console.error('Error creating ticket:', error)
-      throw error // Re-throw to let TicketForm handle it
+      throw error
     } finally {
       setIsLoading(false)
     }
@@ -59,10 +59,8 @@ export default function NewTicketPage() {
 
       {/* Form Card */}
       <div className="bg-white rounded-lg border border-gray-200 p-6 md:p-8">
-        <TicketForm onSubmit={handleSubmit} />
+        <TicketForm onSubmit={(data) => { void handleSubmit(data) }} />
       </div>
     </div>
   )
 }
-
-
