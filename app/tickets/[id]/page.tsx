@@ -11,7 +11,7 @@ const MOCK_TICKETS: Ticket[] = [
   {
     id: 'mock-1',
     topic: 'Cannot login to system',
-    status: 'open',
+    status: 'new',
     owner: 'Jane Doe',
     problem_description:
       'User reports being unable to login despite correct credentials. Password reset was attempted but issue persists.',
