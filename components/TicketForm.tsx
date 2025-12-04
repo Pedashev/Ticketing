@@ -1,20 +1,27 @@
 'use client'
 
 import { useState } from 'react'
-import { CreateTicketInput } from '@/types/ticket'
+import { Ticket, CreateTicketInput, UpdateTicketInput } from '@/types/ticket'
 
-type TicketFormProps = {
-  onSubmit: (data: CreateTicketInput) => Promise<void>
+export type TicketFormProps = {
+  ticket?: Ticket
+  onSubmit: (data: CreateTicketInput | UpdateTicketInput) => Promise<void>
+  onCancel?: () => void
 }
 
-export default function TicketForm({ onSubmit }: TicketFormProps) {
-  const [form, setForm] = useState<CreateTicketInput>({
-    topic: '',
-    owner: '',
-    problem_description: '',
+export default function TicketForm({ ticket, onSubmit, onCancel }: TicketFormProps) {
+  const isEdit = !!ticket
+
+  const [form, setForm] = useState<CreateTicketInput | UpdateTicketInput>({
+    topic: ticket?.topic ?? '',
+    owner: ticket?.owner ?? '',
+    problem_description: ticket?.problem_description ?? '',
+    ...(isEdit ? { id: ticket!.id, status: ticket!.status } : {}),
   })
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
@@ -55,12 +62,42 @@ export default function TicketForm({ onSubmit }: TicketFormProps) {
         />
       </div>
 
-      <button
-        type="submit"
-        className="px-4 py-2 bg-blue-600 text-white rounded"
-      >
-        Create Ticket
-      </button>
+      {isEdit && (
+        <div>
+          <label className="block font-medium">Status</label>
+          <select
+            name="status"
+            className="border p-2 w-full"
+            value={form.status}
+            onChange={(e) =>
+              setForm({ ...form, status: e.target.value as Ticket['status'] })
+            }
+          >
+            <option value="open">Open</option>
+            <option value="in_progress">In Progress</option>
+            <option value="closed">Closed</option>
+          </select>
+        </div>
+      )}
+
+      <div className="flex gap-3">
+        <button
+          type="submit"
+          className="px-4 py-2 bg-blue-600 text-white rounded"
+        >
+          {isEdit ? 'Update Ticket' : 'Create Ticket'}
+        </button>
+
+        {onCancel && (
+          <button
+            type="button"
+            onClick={onCancel}
+            className="px-4 py-2 border rounded"
+          >
+            Cancel
+          </button>
+        )}
+      </div>
     </form>
   )
 }
