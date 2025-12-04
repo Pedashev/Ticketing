@@ -1,22 +1,18 @@
 'use client'
 
 import { useState } from 'react'
-import { Ticket, CreateTicketInput, UpdateTicketInput } from '@/types/ticket'
+import { CreateTicketInput, UpdateTicketInput, Ticket } from '@/types/ticket'
 
-export type TicketFormProps = {
+type TicketFormProps = {
   ticket?: Ticket
   onSubmit: (data: CreateTicketInput | UpdateTicketInput) => Promise<void>
-  onCancel?: () => void
 }
 
-export default function TicketForm({ ticket, onSubmit, onCancel }: TicketFormProps) {
-  const isEdit = !!ticket
-
+export default function TicketForm({ ticket, onSubmit }: TicketFormProps) {
   const [form, setForm] = useState<CreateTicketInput | UpdateTicketInput>({
     topic: ticket?.topic ?? '',
     owner: ticket?.owner ?? '',
     problem_description: ticket?.problem_description ?? '',
-    ...(isEdit ? { id: ticket!.id, status: ticket!.status } : {}),
   })
 
   const handleChange = (
@@ -39,6 +35,7 @@ export default function TicketForm({ ticket, onSubmit, onCancel }: TicketFormPro
           className="border p-2 w-full"
           value={form.topic}
           onChange={handleChange}
+          required
         />
       </div>
 
@@ -49,6 +46,7 @@ export default function TicketForm({ ticket, onSubmit, onCancel }: TicketFormPro
           className="border p-2 w-full"
           value={form.owner}
           onChange={handleChange}
+          required
         />
       </div>
 
@@ -59,45 +57,16 @@ export default function TicketForm({ ticket, onSubmit, onCancel }: TicketFormPro
           className="border p-2 w-full"
           value={form.problem_description}
           onChange={handleChange}
+          required
         />
       </div>
 
-      {isEdit && (
-        <div>
-          <label className="block font-medium">Status</label>
-          <select
-            name="status"
-            className="border p-2 w-full"
-            value={form.status}
-            onChange={(e) =>
-              setForm({ ...form, status: e.target.value as Ticket['status'] })
-            }
-          >
-            <option value="open">Open</option>
-            <option value="in_progress">In Progress</option>
-            <option value="closed">Closed</option>
-          </select>
-        </div>
-      )}
-
-      <div className="flex gap-3">
-        <button
-          type="submit"
-          className="px-4 py-2 bg-blue-600 text-white rounded"
-        >
-          {isEdit ? 'Update Ticket' : 'Create Ticket'}
-        </button>
-
-        {onCancel && (
-          <button
-            type="button"
-            onClick={onCancel}
-            className="px-4 py-2 border rounded"
-          >
-            Cancel
-          </button>
-        )}
-      </div>
+      <button
+        type="submit"
+        className="px-4 py-2 bg-blue-600 text-white rounded"
+      >
+        Save
+      </button>
     </form>
   )
 }
