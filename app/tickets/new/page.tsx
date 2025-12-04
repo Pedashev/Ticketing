@@ -1,70 +1,49 @@
 'use client'
 
-import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import TicketForm from '@/components/TicketForm'
 import { CreateTicketInput } from '@/types/ticket'
+import Link from 'next/link'
+import { useState } from 'react'
 
-interface TicketFormProps {
-  onSubmit: (data: CreateTicketInput) => Promise<void>
-}
+export default function NewTicketPage() {
+  const router = useRouter()
+  const [isLoading, setIsLoading] = useState(false)
 
-export default function TicketForm({ onSubmit }: TicketFormProps) {
-  const [form, setForm] = useState<CreateTicketInput>({
-    topic: '',
-    status: 'new',
-    owner: '',
-    problem_description: '',
-  })
+  const handleSubmit = async (data: CreateTicketInput) => {
+    setIsLoading(true)
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
-  }
+    const response = await fetch('/api/tickets', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    })
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    await onSubmit(form)
+    const ticket = await response.json()
+    router.push(`/tickets/${ticket.id}`)
+
+    setIsLoading(false)
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Topic</label>
-        <input
-          name="topic"
-          value={form.topic}
-          onChange={handleChange}
-          className="w-full border rounded-md p-2"
-          required
-        />
+    <div className="max-w-3xl mx-auto">
+      <div className="mb-6">
+        <Link
+          href="/"
+          className="text-blue-600 hover:text-blue-700 text-sm font-medium mb-4 inline-block"
+        >
+          ← Back to Tickets
+        </Link>
+
+        <h2 className="text-3xl font-bold text-gray-900">Create New Ticket</h2>
+        <p className="text-gray-600 mt-1">
+          Fill out the form below to create a new support ticket.
+        </p>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Owner</label>
-        <input
-          name="owner"
-          value={form.owner}
-          onChange={handleChange}
-          className="w-full border rounded-md p-2"
-          required
-        />
+      <div className="bg-white rounded-lg border border-gray-200 p-6 md:p-8">
+        <TicketForm onSubmit={handleSubmit} />
       </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Problem Description</label>
-        <textarea
-          name="problem_description"
-          value={form.problem_description}
-          onChange={handleChange}
-          className="w-full border rounded-md p-2 h-28"
-          required
-        />
-      </div>
-
-      <button
-        type="submit"
-        className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-      >
-        Create Ticket
-      </button>
-    </form>
+    </div>
   )
 }
